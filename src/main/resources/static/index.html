@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的IDEA开发网页</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .user-info {
+            font-size: 16px;
+            color: #333;
+        }
+        .logout-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        .login-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .login-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="user-info">
+        <span id="userInfo"></span>
+    </div>
+    <div id="authButtons">
+        <a href="login.html" class="login-link">登录</a>
+    </div>
+</div>
+<div class="container">
+    <h1>你好，这是IDEA开发的网页！</h1>
+    <p>HTML + CSS + JS 静态网页</p>
+    <div id="date-time" class="date-time"></div>
+    <div class="personal-info">
+        <h2>个人信息</h2>
+        <p id="name">姓名：加载中...</p>
+        <p id="age">年龄：加载中...</p>
+        <p id="profession">职业：加载中...</p>
+        <p id="email">邮箱：加载中...</p>
+    </div>
+    <button id="btn">点击我</button>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
