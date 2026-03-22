@@ -1,0 +1,8 @@
+app:
+  name: my-web-app
+  version: 1.0.0
+  default-profile:
+    name: 谢沁桐
+    age: 20
+    profession: 开发者
+    email: 2902125312@qq.com

@@ -1,0 +1,3 @@
+jwt:
+  secret: your-256-bit-secret-key-for-jwt-signing-must-be-at-least-32-characters-long
+  expiration: 86400000

@@ -1,6 +1,7 @@
 package org.example.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.List;
 
 /**
  * 安全配置类 - 配置 Spring Security 相关设置
@@ -21,6 +24,13 @@ public class SecurityConfig {
 
     // 注入 JWT 认证过滤器
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    // 从配置文件中读取安全配置
+    @Value("${security.csrf.enabled}")
+    private boolean csrfEnabled;
+    
+    @Value("${security.allowed-paths}")
+    private List<String> allowedPaths;
 
     /**
      * 密码编码器 Bean - 使用 BCrypt 加密
@@ -39,15 +49,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())  // 禁用 CSRF（因为使用无状态的 JWT）
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // 设置无状态会话
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()  // 认证相关接口允许匿名访问
-                .requestMatchers("/api/profile").permitAll()  // 个人信息接口允许匿名访问
-                .requestMatchers("/", "/index.html", "/login.html", "/register.html", "/script.js", "/style.css").permitAll()  // 静态资源允许匿名访问
-                .anyRequest().authenticated()  // 其他所有请求需要认证
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // 添加 JWT 过滤器到安全链中
+            .csrf(csrf -> {
+                if (!csrfEnabled) {
+                    csrf.disable();
+                }
+            })
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> {
+                // 配置允许匿名访问的路径
+                for (String path : allowedPaths) {
+                    auth.requestMatchers(path).permitAll();
+                }
+                // 其他所有请求需要认证
+                auth.anyRequest().authenticated();
+            })
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

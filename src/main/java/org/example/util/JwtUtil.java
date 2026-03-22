@@ -2,6 +2,7 @@ package org.example.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,13 +15,18 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // 密钥 - 生产环境应使用环境变量或配置文件管理
-    private static final String SECRET = "your-256-bit-secret-key-for-jwt-signing-must-be-at-least-32-characters-long";
-    // 令牌过期时间（24小时）
-    private static final long EXPIRATION = 86400000;
+    // 从配置文件中读取密钥
+    @Value("${jwt.secret}")
+    private String secret;
+    
+    // 从配置文件中读取过期时间
+    @Value("${jwt.expiration}")
+    private long expiration;
 
     // 基于密钥生成 HMAC-SHA256 签名密钥
-    private final SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    private SecretKey getKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     /**
      * 生成 JWT 令牌
@@ -29,13 +35,13 @@ public class JwtUtil {
      */
     public String generateToken(String username) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + EXPIRATION);
+        Date expiryDate = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
                 .subject(username)  // 设置用户名作为主题
                 .issuedAt(now)      // 签发时间
                 .expiration(expiryDate)  // 过期时间
-                .signWith(key)      // 使用密钥签名
+                .signWith(getKey())      // 使用密钥签名
                 .compact();         // 生成最终的 JWT 字符串
     }
 
@@ -46,7 +52,7 @@ public class JwtUtil {
      */
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(key)     // 使用密钥验证签名
+                .verifyWith(getKey())     // 使用密钥验证签名
                 .build()
                 .parseSignedClaims(token)  // 解析令牌
                 .getPayload();       // 获取载荷部分
@@ -61,7 +67,7 @@ public class JwtUtil {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(key)     // 验证签名
+                    .verifyWith(getKey())     // 验证签名
                     .build()
                     .parseSignedClaims(token);  // 解析令牌
             return true;  // 验证通过

@@ -1,0 +1,12 @@
+security:
+  allowed-paths:
+    - /
+    - /index.html
+    - /auth/**
+    - /profile
+    - /login.html
+    - /register.html
+    - /script.js
+    - /style.css
+  csrf:
+    enabled: false
