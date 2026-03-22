@@ -15,7 +15,10 @@ function displayDateTime() {
 async function loadProfile() {
     try {
         const response = await fetch('/api/profile');
-        const profile = await response.json();
+        const result = await response.json();
+        
+        // 从ApiResponse中获取data字段
+        const profile = result.data;
         
         document.getElementById('name').textContent = `姓名：${profile.name}`;
         document.getElementById('age').textContent = `年龄：${profile.age}`;

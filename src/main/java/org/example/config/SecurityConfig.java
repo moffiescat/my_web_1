@@ -1,7 +1,6 @@
 package org.example.config;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,18 +18,20 @@ import java.util.List;
  */
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
+@ConfigurationProperties(prefix = "security")
 public class SecurityConfig {
 
-    // 注入 JWT 认证过滤器
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    
     // 从配置文件中读取安全配置
-    @Value("${security.csrf.enabled}")
     private boolean csrfEnabled;
-    
-    @Value("${security.allowed-paths}")
     private List<String> allowedPaths;
+
+    public void setCsrfEnabled(boolean csrfEnabled) {
+        this.csrfEnabled = csrfEnabled;
+    }
+
+    public void setAllowedPaths(List<String> allowedPaths) {
+        this.allowedPaths = allowedPaths;
+    }
 
     /**
      * 密码编码器 Bean - 使用 BCrypt 加密
@@ -44,10 +45,11 @@ public class SecurityConfig {
     /**
      * 安全过滤器链配置
      * @param http HttpSecurity
+     * @param jwtAuthenticationFilter JwtAuthenticationFilter
      * @return SecurityFilterChain
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
             .csrf(csrf -> {
                 if (!csrfEnabled) {
@@ -57,8 +59,10 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> {
                 // 配置允许匿名访问的路径
-                for (String path : allowedPaths) {
-                    auth.requestMatchers(path).permitAll();
+                if (allowedPaths != null) {
+                    for (String path : allowedPaths) {
+                        auth.requestMatchers(path).permitAll();
+                    }
                 }
                 // 其他所有请求需要认证
                 auth.anyRequest().authenticated();

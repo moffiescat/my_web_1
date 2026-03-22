@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.dto.ApiResponse;
 import org.example.model.Profile;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class ProfileController {
 
     @Value("${app.default-profile.name}")
@@ -25,7 +27,14 @@ public class ProfileController {
 
     @GetMapping("/profile")
     public ApiResponse<Profile> getProfile() {
-        Profile profile = new Profile(defaultName, defaultAge, defaultProfession, defaultEmail);
-        return ApiResponse.success(profile);
+        log.info("获取个人信息");
+        try {
+            Profile profile = new Profile(defaultName, defaultAge, defaultProfession, defaultEmail);
+            log.info("个人信息获取成功: name={}", defaultName);
+            return ApiResponse.success(profile);
+        } catch (Exception e) {
+            log.error("获取个人信息失败: error={}", e.getMessage());
+            throw e;
+        }
     }
 }

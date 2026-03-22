@@ -2,8 +2,8 @@ security:
   allowed-paths:
     - /
     - /index.html
-    - /auth/**
-    - /profile
+    - /api/auth/**
+    - /api/profile
     - /login.html
     - /register.html
     - /script.js
