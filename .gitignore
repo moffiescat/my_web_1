@@ -4,6 +4,11 @@ target/
 !**/src/test/**/target/
 .kotlin
 
+### 日志文件 ###
+logs/
+*.log
+my-web-app.log
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
