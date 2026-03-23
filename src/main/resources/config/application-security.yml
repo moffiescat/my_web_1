@@ -4,6 +4,7 @@ security:
     - /index.html
     - /api/auth/**
     - /api/profile
+    - /api/visit/**
     - /login.html
     - /register.html
     - /script.js
