@@ -1,9 +1,9 @@
 spring:
   data:
     redis:
-      #host: localhost
+      host: localhost
       #本地的配置
-      host: redis
+#      host: redis
       #容器的配置
       port: 6379
       timeout: 3000ms

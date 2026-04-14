@@ -1,0 +1,34 @@
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+
+
+
+@Data
+
+自动生成get、set、equals、hashCode、canEqual、toString方法
+
+
+@NoArgsConstructor
+
+自动给类生成一个 无参构造方法（空构造）
+但一旦你自己写了构造方法
+默认无参构造就没了！
+这时候 Spring、MyBatis、JSON 序列化就会报错，因为它们反射创建对象必须用无参构造。
+加 @NoArgsConstructor 就能强制把无参构造弄回来。
+
+
+@AllArgsConstructor
+
+自动生成一个「包含所有字段」的构造方法
+一旦加了 @AllArgsConstructor，
+默认的无参构造方法就会消失！
+所以：
+实体类、Bean、要被 Spring/MyBatis/JSON 用的类
+必须同时加上 @NoArgsConstructor
+否则会报：
+没有默认构造方法

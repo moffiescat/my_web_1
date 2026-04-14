@@ -1,0 +1,19 @@
+@Slf4j
+
+是lombok的日志，可以使用更轻便的写入日志的方法
+
+log.trace("追踪日志，最细");
+log.debug("调试信息，开发用");
+log.info("普通信息，上线常用");
+log.warn("警告，不影响运行");
+log.error("报错，必须看！");
+
+带参数：
+log.info("用户id={}，姓名={} 登录成功", userId, username);
+
+打印异常：
+try {
+    // ...
+} catch (Exception e) {
+    log.error("查询用户失败，id={}", id, e);
+}

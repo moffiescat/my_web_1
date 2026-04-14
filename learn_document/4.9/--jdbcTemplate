@@ -1,0 +1,13 @@
+
+
+
+public <T> List<T> query(String sql, RowMapper<T> rowMapper, @Nullable Object... args)
+
+public <T> T queryForObject(String sql, RowMapper<T> rowMapper, @Nullable Object... args)
+
+例如：jdbcTemplate.queryForObject(sql, userRowMapper, username)
+
+用于执行查询语句；
+sql：需要执行的 SQL 语句；
+rowMapper：用于确定返回的集合（List）的类型；
+args：表示需要传入到 SQL 语句的参数。
