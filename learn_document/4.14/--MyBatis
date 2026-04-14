@@ -1,0 +1,117 @@
+# MyBatis 学习笔记
+
+## 什么是 MyBatis？
+
+MyBatis 是一个优秀的持久层框架，它支持自定义 SQL、存储过程以及高级映射。MyBatis 消除了几乎所有的 JDBC 代码和手动设置参数以及获取结果的工作。MyBatis 可以使用简单的 XML 或注解来配置和映射原生类型、接口和 Java POJO（Plain Old Java Objects）为数据库中的记录。
+
+## MyBatis 与 JDBC 的对比
+
+### JDBC 的问题
+- 1. 手动设置参数和获取结果
+- 2. 频繁创建和释放数据库连接，效率低
+- 3. SQL 语句硬编码，修改SQL需要重新编译
+- 4. 没有缓存机制
+- 5. 缺少对SQL注入的防护
+
+### MyBatis 的优势
+- 1. 自动映射结果集到 Java 对象
+- 2. 使用连接池管理连接
+- 3. SQL 与 Java 代码分离
+- 4. 支持缓存
+- 5. 参数预处理，防止 SQL 注入
+- 6. 灵活的配置和映射
+
+## MyBatis 在项目中的应用
+
+### 本项目配置
+
+1. **添加依赖** (`pom.xml`)
+```xml
+<dependency>
+    <groupId>org.mybatis.spring.boot</groupId>
+    <artifactId>mybatis-spring-boot-starter</artifactId>
+    <version>3.0.3</version>
+</dependency>
+```
+
+2. **配置文件** (`application-datasource.yml`)
+```yaml
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: org.example.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+```
+
+### 核心组件
+
+1. **Mapper 接口**
+   - 定义数据库操作方法
+   - 使用 `@Mapper` 注解标记
+   - 方法参数使用 `@Param` 注解（可选）
+
+2. **Mapper XML**
+   - 编写 SQL 语句
+   - 配置结果映射
+   - 定义动态 SQL
+
+### 本项目示例
+
+**UserMapper.java**
+```java
+@Mapper
+public interface UserMapper {
+    User save(User user);
+    Optional<User> findById(Long id);
+    Optional<User> findByUsername(String username);
+    boolean existsByUsername(String username);
+}
+```
+
+**UserMapper.xml**
+```xml
+<mapper namespace="org.example.mapper.UserMapper">
+    <resultMap id="UserResultMap" type="org.example.entity.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, password, email)
+        VALUES (#{username}, #{password}, #{email})
+    </insert>
+
+    <select id="findByUsername" resultMap="UserResultMap">
+        SELECT id, username, password, email, created_at
+        FROM users
+        WHERE username = #{username}
+    </select>
+</mapper>
+```
+
+### 使用流程
+
+1. 定义 Mapper 接口
+2. 编写 Mapper XML 或使用注解
+3. 在 Service 层注入 Mapper
+4. MyBatis 自动实现接口代理
+
+## 常用注解
+
+- `@Mapper` - 标记为 MyBatis Mapper
+- `@Param` - 指定参数名称
+- `@Select` - SELECT 查询
+- `@Insert` - INSERT 语句
+- `@Update` - UPDATE 语句
+- `@Delete` - DELETE 语句
+
+## 注意事项
+
+1. Mapper 接口和 XML 文件的命名空间必须一致
+2. 方法名必须与 XML 中的 id 一致
+3. 使用 `#{}` 而不是 `${}` 防止 SQL 注入
+4. 配置 `map-underscore-to-camel-case` 自动转换下划线命名

@@ -1,0 +1,184 @@
+# 自定义全局异常
+
+## 为什么要自定义全局异常？
+
+在 Web 应用中，统一的异常处理可以：
+- 规范返回给前端的错误格式
+- 避免暴露内部错误信息
+- 减少重复的 try-catch 代码
+- 便于前后端联调和日志记录
+
+## 项目中的实现
+
+### 1. BusinessException（自定义业务异常）
+
+```java
+@Getter
+public class BusinessException extends RuntimeException {
+
+    private final int code;
+
+    public BusinessException(String message) {
+        super(message);
+        this.code = 500;
+    }
+
+    public BusinessException(int code, String message) {
+        super(message);
+        this.code = code;
+    }
+
+    public BusinessException(String message, Throwable cause) {
+        super(message, cause);
+        this.code = 500;
+    }
+
+    public BusinessException(int code, String message, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+    }
+}
+```
+
+**要点说明：**
+- `extends RuntimeException`：运行时异常，无需显式捕获
+- `code` 字段：自定义错误码，便于前端区分错误类型
+- 多个构造方法：支持不同场景（带错误码、带原始异常等）
+- `@Getter`：Lombok 注解，生成 getCode() 方法
+
+### 2. GlobalExceptionHandler（全局异常处理器）
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<?>> handleBusinessException(BusinessException e) {
+        return ResponseEntity
+                .status(HttpStatus.valueOf(e.getCode()))
+                .body(ApiResponse.error(e.getCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException e) {
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(400, "参数验证失败", errors));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(500, "服务器内部错误：" + e.getMessage()));
+    }
+}
+```
+
+**要点说明：**
+- `@RestControllerAdvice`：等价于 `@ControllerAdvice` + `@ResponseBody`，作用于所有 Controller
+- `@ExceptionHandler`：指定捕获的异常类型
+- `MethodArgumentNotValidException`：处理 @Valid 验证失败的情况
+- 最后一个处理所有未捕获的异常，作为兜底
+
+### 3. ApiResponse（统一响应格式）
+
+```java
+public class ApiResponse<T> {
+    private int code;
+    private String message;
+    private T data;
+
+    public static <T> ApiResponse<T> success(T data) { ... }
+    public static <T> ApiResponse<T> error(int code, String message) { ... }
+    public static <T> ApiResponse<T> error(int code, String message, T errors) { ... }
+}
+```
+
+## 项目中使用示例
+
+### 抛出业务异常
+
+```java
+// 在 Service 层
+public User login(LoginRequest request) {
+    User user = userMapper.findByUsername(request.getUsername())
+            .orElseThrow(() -> new BusinessException(401, "用户名或密码错误"));
+
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        throw new BusinessException(401, "用户名或密码错误");
+    }
+    return user;
+}
+```
+
+### 参数校验
+
+```java
+// 在 Controller 层
+@PostMapping("/register")
+public ApiResponse<?> register(@Valid @RequestBody RegisterRequest request) {
+    // ...
+}
+```
+
+```java
+// 在 DTO 中
+public class RegisterRequest {
+    @NotBlank(message = "用户名不能为空")
+    @Size(min = 3, max = 20, message = "用户名长度应在3-20之间")
+    private String username;
+
+    @NotBlank(message = "密码不能为空")
+    @Size(min = 6, message = "密码长度至少6位")
+    private String password;
+
+    @Email(message = "邮箱格式不正确")
+    private String email;
+}
+```
+
+## 返回给前端的格式
+
+**业务异常（401）**
+```json
+{
+    "code": 401,
+    "message": "用户名或密码错误",
+    "data": null
+}
+```
+
+**参数校验失败（400）**
+```json
+{
+    "code": 400,
+    "message": "参数验证失败",
+    "data": {
+        "username": "用户名长度应在3-20之间",
+        "password": "密码长度至少6位"
+    }
+}
+```
+
+**服务器内部错误（500）**
+```json
+{
+    "code": 500,
+    "message": "服务器内部错误：...",
+    "data": null
+}
+```
+
+## 最佳实践
+
+1. **统一错误码**：建立错误码规范，如 401 认证失败、404 资源不存在
+2. **不暴露敏感信息**：生产环境关闭详细异常堆栈
+3. **记录日志**：在异常处理中记录日志，便于排查
+4. **国际化**：考虑使用消息资源文件支持多语言
