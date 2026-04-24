@@ -3,8 +3,8 @@ spring:
       url: jdbc:mysql://localhost:3306/my_web_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Shanghai
 #      本地配置
 #      url: jdbc:mysql://mysql:3306/my_web_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-      username: root
-      password: 123456
+      username: ${SPRING_DATASOURCE_USERNAME:root}
+      password: ${SPRING_DATASOURCE_PASSWORD}
       driver-class-name: com.mysql.cj.jdbc.Driver
       hikari:
         maximum-pool-size: 10
@@ -15,6 +15,7 @@ spring:
         mode: always  # 启动时执行 SQL 脚本
         encoding: UTF-8
         schema-locations: classpath:init.sql  # 建表脚本
+
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   type-aliases-package: org.example.entity

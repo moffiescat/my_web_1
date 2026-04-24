@@ -5,6 +5,7 @@ spring:
       #本地的配置
 #      host: redis
       #容器的配置
+      password: ${REDIS_PASSWORD:}
       port: 6379
       timeout: 3000ms
       lettuce:
