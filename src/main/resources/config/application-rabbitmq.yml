@@ -1,0 +1,24 @@
+spring:
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    # 发送方确认配置
+    publisher-confirm-type: correlated
+    # 消息返回配置 (路由不到队列时返回)
+    publisher-returns: true
+    # 模板配置
+    template:
+      mandatory: true
+
+# 邮件队列配置
+mail:
+  exchange: mail.exchange
+  queue: mail.welcome.queue
+  routing-key: mail.welcome
+  # 死信队列配置
+  dead-letter:
+    exchange: mail.dlx.exchange
+    queue: mail.welcome.dlq
+    routing-key: mail.welcome.dead

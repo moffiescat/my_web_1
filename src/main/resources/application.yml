@@ -9,3 +9,5 @@ spring:
       - classpath:config/application-app.yml
       - classpath:config/application-logging.yml
       - classpath:config/application-redis.yml
+      - classpath:config/application-rabbitmq.yml
+      - classpath:config/application-mail.yml
