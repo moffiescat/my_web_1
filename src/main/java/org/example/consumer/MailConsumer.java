@@ -8,7 +8,7 @@ import org.example.dto.WelcomeMailMessage;
 import org.example.service.MailService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
-import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,9 +20,8 @@ public class MailConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.MAIL_QUEUE)
     public void handleWelcomeMail(WelcomeMailMessage message,
-                                   Message amqpMessage,
+                                   @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag,
                                    Channel channel) {
-        long deliveryTag = amqpMessage.getMessageProperties().getDeliveryTag();
 
         log.info("收到欢迎邮件消息: username={}, email={}",
                 message.getUsername(), message.getEmail());
