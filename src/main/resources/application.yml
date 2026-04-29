@@ -3,11 +3,9 @@ spring:
   config:
     import:
       - classpath:config/application-server.yml
-      - classpath:config/application-datasource.yml
       - classpath:config/application-jwt.yml
       - classpath:config/application-security.yml
       - classpath:config/application-app.yml
       - classpath:config/application-logging.yml
-      - classpath:config/application-redis.yml
-      - classpath:config/application-rabbitmq.yml
       - classpath:config/application-mail.yml
+      - classpath:application-${SPRING_PROFILES_ACTIVE:docker}.yml

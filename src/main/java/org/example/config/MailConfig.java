@@ -57,7 +57,7 @@ public class MailConfig {
     }
 
     @Bean
-    public TemplateEngine templateEngine() {
+    public TemplateEngine mailTemplateEngine() {
         TemplateEngine engine = new TemplateEngine();
 
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();

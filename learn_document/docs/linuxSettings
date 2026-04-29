@@ -1,0 +1,20 @@
+# 数据库配置
+SPRING_DATASOURCE_USERNAME=root
+SPRING_DATASOURCE_PASSWORD=123456
+
+# JWT 配置（必须至少32字符）
+JWT_SECRET=jwt-password-config-setting-for-at-least-32-letters
+
+# Redis 配置
+REDIS_PASSWORD=123456
+
+# RabbitMQ 配置
+RABBITMQ_HOST=rabbitmq
+RABBITMQ_USERNAME=guest
+RABBITMQ_PASSWORD=123456
+
+# 邮件配置
+MAIL_HOST=smtp.qq.com
+MAIL_PORT=587
+MAIL_USERNAME=2902125312@qq.com
+MAIL_PASSWORD=ffdgwjfvvhnxddbe

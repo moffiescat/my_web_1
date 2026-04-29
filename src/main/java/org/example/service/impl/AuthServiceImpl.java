@@ -6,10 +6,8 @@ import org.example.dao.UserDao;
 import org.example.dto.LoginRequest;
 import org.example.dto.LoginResponse;
 import org.example.dto.RegisterRequest;
-import org.example.dto.WelcomeMailMessage;
 import org.example.entity.User;
 import org.example.exception.BusinessException;
-import org.example.producer.MailProducer;
 import org.example.service.AuthService;
 import org.example.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +24,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final MailProducer mailProducer;
 
     @Value("${jwt.expiration}")
     private long expiration;
@@ -47,16 +44,6 @@ public class AuthServiceImpl implements AuthService {
 
         userDao.save(user);
         log.info("用户注册成功: username={}, id={}", request.getUsername(), user.getId());
-
-        // 异步发送欢迎邮件
-        WelcomeMailMessage mailMessage = WelcomeMailMessage.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .registeredAt(user.getCreatedAt())
-                .build();
-
-        mailProducer.sendWelcomeMail(mailMessage);
-        log.info("欢迎邮件消息已发布: username={}", request.getUsername());
     }
 
     @Override

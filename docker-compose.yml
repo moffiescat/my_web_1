@@ -8,16 +8,12 @@ services:
     depends_on:
       - mysql
       - redis
-      - rabbitmq
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/my_web_db?useSSL=false&serverTimezone=Asia/Shanghai
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=123456
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_USERNAME=guest
-      - RABBITMQ_PASSWORD=guest
       - MAIL_HOST=smtp.qq.com
       - MAIL_USERNAME=your-email@qq.com
       - MAIL_PASSWORD=your-auth-code
@@ -36,18 +32,6 @@ services:
     volumes:
       - redis-data:/data
 
-  rabbitmq:
-    image: rabbitmq:3.12-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-
 volumes:
   mysql-data:
   redis-data:
-  rabbitmq-data:
