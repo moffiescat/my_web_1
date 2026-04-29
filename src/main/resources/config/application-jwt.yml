@@ -1,3 +1,0 @@
-jwt:
-  secret: ${JWT_SECRET:defaultSecretForDevelopmentOnly}
-  expiration: 86400000  # 24小时

@@ -1,6 +1,5 @@
 # Docker 环境配置 (本地 Docker Desktop 或 云服务器)
-# 使用方式: mvn spring-boot:run -Dspring-boot.run.profiles=docker
-# 或服务器直接用 docker-compose 启动时会自动使用此配置
+# 使用方式: docker-compose up 自动使用此配置
 
 spring:
   datasource:
@@ -11,6 +10,18 @@ spring:
     redis:
       host: ${SPRING_REDIS_HOST:redis}
       port: ${SPRING_REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+      schema-locations: classpath:init.sql
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
@@ -19,16 +30,43 @@ mybatis:
     map-underscore-to-camel-case: true
 
 jwt:
-  secret: ${JWT_SECRET:defaultSecretForDevelopmentOnly}
+  secret: ${JWT_SECRET:defaultSecretForDevelopmentOnly123456789012}
+  expiration: 86400000
 
-mail:
-  host: ${MAIL_HOST:smtp.qq.com}
-  port: ${MAIL_PORT:587}
-  username: ${MAIL_USERNAME:your-email@qq.com}
-  password: ${MAIL_PASSWORD:your-auth-code}
-  properties:
-    mail:
-      smtp:
-        auth: false
-        starttls:
-          enable: false
+server:
+  port: 8080
+
+logging:
+  level:
+    org.example: info
+    org.springframework: warn
+    org.springframework.security: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
+  file:
+    name: logs/my-web-app.log
+    max-size: 10MB
+    max-history: 7
+
+security:
+  allowed-paths:
+    - /
+    - /index.html
+    - /api/auth/**
+    - /api/profile
+    - /api/visit/**
+    - /login.html
+    - /register.html
+    - /script.js
+    - /style.css
+  csrf:
+    enabled: false
+
+app:
+  name: my-web-app
+  version: 1.0.0
+  default-profile:
+    name: 谢沁桐
+    age: 20
+    profession: 开发者
+    email: 2902125312@qq.com

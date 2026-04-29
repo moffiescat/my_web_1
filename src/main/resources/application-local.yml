@@ -1,5 +1,5 @@
 # 本地开发环境配置 (Windows)
-# 使用方式: mvn spring-boot:run -Dspring-boot.run.profiles=local
+# 使用方式: mvn spring-boot:run
 
 spring:
   datasource:
@@ -10,6 +10,18 @@ spring:
     redis:
       host: localhost
       port: 6379
+      password:
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+      schema-locations: classpath:init.sql
 
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
@@ -18,16 +30,43 @@ mybatis:
     map-underscore-to-camel-case: true
 
 jwt:
-  secret: defaultSecretForDevelopmentOnly
+  secret: defaultSecretForDevelopmentOnly123456789012
+  expiration: 86400000
 
-mail:
-  host: smtp.qq.com
-  port: 587
-  username: your-email@qq.com
-  password: your-auth-code
-  properties:
-    mail:
-      smtp:
-        auth: false
-        starttls:
-          enable: false
+server:
+  port: 8080
+
+logging:
+  level:
+    org.example: info
+    org.springframework: warn
+    org.springframework.security: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
+  file:
+    name: logs/my-web-app.log
+    max-size: 10MB
+    max-history: 7
+
+security:
+  allowed-paths:
+    - /
+    - /index.html
+    - /api/auth/**
+    - /api/profile
+    - /api/visit/**
+    - /login.html
+    - /register.html
+    - /script.js
+    - /style.css
+  csrf:
+    enabled: false
+
+app:
+  name: my-web-app
+  version: 1.0.0
+  default-profile:
+    name: 谢沁桐
+    age: 20
+    profession: 开发者
+    email: 2902125312@qq.com

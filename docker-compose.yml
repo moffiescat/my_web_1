@@ -9,14 +9,12 @@ services:
       - mysql
       - redis
     environment:
+      - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/my_web_db?useSSL=false&serverTimezone=Asia/Shanghai
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=123456
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
-      - MAIL_HOST=smtp.qq.com
-      - MAIL_USERNAME=your-email@qq.com
-      - MAIL_PASSWORD=your-auth-code
 
   mysql:
     image: mysql:8.0

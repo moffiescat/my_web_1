@@ -1,11 +1,5 @@
-# 导入其他配置文件
+# 主配置文件
+# 导入对应环境的配置：local (默认) 或 docker
 spring:
   config:
-    import:
-      - classpath:config/application-server.yml
-      - classpath:config/application-jwt.yml
-      - classpath:config/application-security.yml
-      - classpath:config/application-app.yml
-      - classpath:config/application-logging.yml
-      - classpath:config/application-mail.yml
-      - classpath:application-${SPRING_PROFILES_ACTIVE:docker}.yml
+    import: classpath:application-${SPRING_PROFILES_ACTIVE:local}.yml
